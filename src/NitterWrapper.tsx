@@ -27,6 +27,7 @@ class NitterWrapper extends React.PureComponent<Props> {
           source={{ uri: 'https://nitter.net' + this.props.route.path }}
           style={{ flex: 1 }}
           ref = {r => this.webview = r}
+          incognito={true}
         />
 
         <View style={styles.footer}>

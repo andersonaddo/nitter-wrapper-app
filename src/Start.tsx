@@ -25,12 +25,14 @@ const styles = StyleSheet.create({
   container: {
     alignContent: "center",
     justifyContent: "center",
-    margin: 16,
-    flex: 1
+    padding: 16,
+    flex: 1,
+    backgroundColor: "silver"
   },
   text: {
     fontSize: 18,
-    textAlign: "center"
+    textAlign: "center",
+    color: "black"
   },
 });
 
