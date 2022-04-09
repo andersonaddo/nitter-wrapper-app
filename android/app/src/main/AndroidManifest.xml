@@ -34,6 +34,14 @@
           <data android:scheme="https" android:host="nitter.net" />
           <data android:scheme="http" android:host="nitter.net" />
         </intent-filter>
+
+        <!-- This is for receiving sharing -->
+        <intent-filter  android:label="Open with Nitter">
+          <action android:name="android.intent.action.SEND" />
+          <category android:name="android.intent.category.DEFAULT" />
+          <data android:mimeType="text/*" />
+      </intent-filter>
+      
       </activity>
     </application>
 </manifest>

@@ -1,9 +1,15 @@
-import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import NitterWrapper from './NitterWrapper'
-import Start from './Start'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { Text } from "react-native"
+import React from 'react';
+import { Text } from "react-native";
+import ShareMenu, { ShareCallback, ShareListener } from "react-native-share-menu";
+import NitterWrapper from './NitterWrapper';
+import Start from './Start';
+
+//https://reactnavigation.org/docs/typescript/
+export type RootStackParamList = {
+  NitterWrapper: {url?: string};
+};
 
 const Stack = createNativeStackNavigator();
 
@@ -25,10 +31,25 @@ const linking = {
 
 
 class App extends React.PureComponent {
+  listener: ShareListener | undefined;
+  navigator: any;
+
+
+  componentDidMount(){
+    ShareMenu.getInitialShare(this.handleShare);
+    this.listener = ShareMenu.addNewShareListener(this.handleShare);
+  }
+
+  componentWillUnmount(){
+    this.listener?.remove()
+  }
 
   render() {
     return (
-      <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+      <NavigationContainer 
+      linking={linking} 
+      fallback={<Text>Loading...</Text>}
+      ref = {r => this.navigator = r}>
         <Stack.Navigator initialRouteName="Home">
 
           <Stack.Screen
@@ -46,6 +67,30 @@ class App extends React.PureComponent {
         </Stack.Navigator>
       </NavigationContainer>
     )
+  }
+
+  handleShare : ShareCallback = (item) => {
+    if (!item) {
+      return;
+    }
+
+    if (typeof item.data != "string") return;
+
+    if (!this.isValidHttpUrl(item.data)) {
+      return false
+    }else{
+      this.navigator.navigate("NitterWrapper", {url: item.data})
+    }
+  }
+
+  isValidHttpUrl(s : string) {
+    let url;
+    try {
+      url = new URL(s);
+    } catch (e) { 
+      return false; 
+    }
+    return /https?/.test(url.protocol);
   }
 }
 
