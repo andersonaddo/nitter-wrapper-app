@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import React from 'react';
 import { Text } from "react-native";
@@ -8,7 +8,7 @@ import Start from './Start';
 
 //https://reactnavigation.org/docs/typescript/
 export type RootStackParamList = {
-  NitterWrapper: {url?: string};
+  NitterWrapper: { url?: string };
 };
 
 const Stack = createNativeStackNavigator();
@@ -33,35 +33,35 @@ const linking = {
 class App extends React.PureComponent {
   listener: ShareListener | undefined;
   navigator: any;
+  hasCheckedInitial: boolean = false;
 
 
-  componentDidMount(){
-    ShareMenu.getInitialShare(this.handleShare);
+  componentDidMount() {
     this.listener = ShareMenu.addNewShareListener(this.handleShare);
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     this.listener?.remove()
   }
 
   render() {
     return (
-      <NavigationContainer 
-      linking={linking} 
-      fallback={<Text>Loading...</Text>}
-      ref = {r => this.navigator = r}>
-        <Stack.Navigator initialRouteName="Home">
+      <NavigationContainer
+        linking={linking}
+        fallback={<Text>Loading...</Text>}
+        ref={this.updateNavigatorReference}>
+        <Stack.Navigator initialRouteName="Start">
 
           <Stack.Screen
             name="Start"
             component={Start}
-            options={{headerShown:false}}
+            options={{ headerShown: false }}
           />
 
           <Stack.Screen
             name="NitterWrapper"
             component={NitterWrapper}
-            options={{headerShown:false}}
+            options={{ headerShown: false }}
           />
 
         </Stack.Navigator>
@@ -69,7 +69,15 @@ class App extends React.PureComponent {
     )
   }
 
-  handleShare : ShareCallback = (item) => {
+  updateNavigatorReference = (r?: NavigationContainerRef<{ NitterWrapper: unknown; }> | null) => {
+    this.navigator = r
+    if (r && !this.hasCheckedInitial) {
+      this.hasCheckedInitial = true
+      ShareMenu.getInitialShare(this.handleShare);
+    }
+  }
+
+  handleShare: ShareCallback = (item) => {
     if (!item) {
       return;
     }
@@ -78,17 +86,17 @@ class App extends React.PureComponent {
 
     if (!this.isValidHttpUrl(item.data)) {
       return false
-    }else{
-      this.navigator.navigate("NitterWrapper", {url: item.data})
+    } else {
+      this.navigator.navigate("NitterWrapper", { url: item.data })
     }
   }
 
-  isValidHttpUrl(s : string) {
+  isValidHttpUrl(s: string) {
     let url;
     try {
       url = new URL(s);
-    } catch (e) { 
-      return false; 
+    } catch (e) {
+      return false;
     }
     return /https?/.test(url.protocol);
   }

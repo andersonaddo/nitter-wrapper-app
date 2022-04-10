@@ -1,8 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 
-
-
 //https://developer.android.com/training/app-links/verify-site-associations#unverified-apps
 class Start extends React.PureComponent {
 
